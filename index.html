@@ -77,6 +77,20 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 .gal img{width:150px;height:110px;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:zoom-in}
 #zoom img{max-width:100%;max-height:85vh;display:block;margin:auto}
 .note{color:var(--muted);font-size:14px;margin:-4px 0 18px}
+.rowbtns{white-space:nowrap}
+.sysbtn{margin-inline-start:10px;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);cursor:pointer}
+.sysbtn:hover{border-color:var(--accent);color:var(--accent)}
+.sys-sec{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.sys-sec h3{margin:0 0 10px;font-size:15px}
+.sys-row{display:grid;grid-template-columns:150px 1fr auto;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.sys-row:first-of-type{border-top:0}
+.sys-row .k{color:var(--muted);font-size:13px;direction:ltr;text-align:left}
+.sys-row .v{font-weight:600;word-break:break-word;user-select:all}
+.sys-row .v.empty{color:var(--muted);font-weight:400;user-select:none}
+.cp{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer;min-width:52px}
+.cp.done{border-color:var(--ok);color:var(--ok)}
+#sys{max-width:min(720px,94vw)}
+@media (max-width:560px){.sys-row{grid-template-columns:1fr auto}.sys-row .k{grid-column:1/-1;text-align:start}}
 [hidden]{display:none!important}
 #login{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:max(20px,env(safe-area-inset-top,0px)) 16px max(20px,env(safe-area-inset-bottom,0px));overflow:auto;
  background:
@@ -197,11 +211,12 @@ input[readonly]{opacity:.8;cursor:not-allowed}
 </section>
 </main>
 
+<dialog id="sys"><div class="dlg-h"><strong id="s_title">بيانات السيستم</strong><div class="actions"><button class="btn primary" type="button" id="copyAll">نسخ الكل</button><button class="btn" data-close>إغلاق</button></div></div><div class="dlg-b" id="s_body"></div></dialog>
 <dialog id="detail"><div class="dlg-h"><strong id="d_title"></strong><button class="btn" data-close>إغلاق</button></div><div class="dlg-b" id="d_body"></div></dialog>
 <dialog id="zoom"><div class="dlg-h"><span></span><button class="btn" data-close>إغلاق</button></div><div class="dlg-b"><img alt=""></div></dialog>
 
 <script>
-const HUBS=["03DSP-Elsadat Hub","3rd settelment","Al Waha hub","Alexandria Hub","Asher Hub","Assiut Hub","Aswan Hub","Banha Hub","Bani Mazar Hub","Behira Hub","Beni Suef Hub","Dikernis Hub","Domiatta Hub","Downtown Hub","Edfo Hub","El Obour Hub","El Quseir Hub","ElAgamy Hub","ElMahala Hub","El-Mansoura Hub","El-Sharkia Hub","Faisal Hub","Faqous Hub","Fayoum Hub","Gesr Elsuez Hub","Hadayk El Ahram Hub","Hadayk October","Haram Hub","Hawamdya Hub","Heliopolis Hub","Helwan Hub","Huarghada Hub","Imbaba Hub","Inventory Hub","Ismailia Hub","Kafrelsheikh Hub","Katamya-New Hub","Khorshid Hub","Luxor Hub","Maadi Hub","Madinaty Hub","Mansoura-Talkha Hub","Marg Hub","Matrouh Hub","Minya Hub","Mohandseen Hub","Mokattam Hub","Monufia Hub","Nagaa Hammadi Hub","Nasr City Hub","New Cairo Hub","New October Hub","New Valley Hub","October Hub","Port Said Hub","Qalyoub Hub","Qena Hub","Sharm EL Sheikh Hub","Sheraton Hub","Shobra Hub","Shorouk Hub","Smouha Hub","Sohag Hub","Suez Hub","Tanta Hub","Zahraa El Maadi Hub","Zahraa Nasr City Hub"];
+let HUBS=["3rd settelment","Al Waha hub","Alexandria Hub","Asher Hub","Assiut Hub","Aswan Hub","Banha Hub","Bani Mazar Hub","Behira Hub","Beni Suef Hub","Dikernis Hub","Domiatta Hub","Downtown Hub","Edfo Hub","El Obour Hub","El Quseir Hub","ElAgamy Hub","ElMahala Hub","El-Mansoura Hub","El-Sharkia Hub","Faisal Hub","Faqous Hub","Fayoum Hub","Gesr Elsuez Hub","Hadayk El Ahram Hub","Hadayk October","Haram Hub","Hawamdya Hub","Heliopolis Hub","Helwan Hub","Huarghada Hub","Imbaba Hub","Ismailia Hub","Kafrelsheikh Hub","Katamya-New Hub","Khorshid Hub","Luxor Hub","Maadi Hub","Madinaty Hub","Mansoura-Talkha Hub","Marg Hub","Matrouh Hub","Minya Hub","Mohandseen Hub","Mokattam Hub","Monufia Hub","Nagaa Hammadi Hub","Nasr City Hub","New Cairo Hub","New October Hub","New Valley Hub","October Hub","Port Said Hub","Qalyoub Hub","Qena Hub","Sharm EL Sheikh Hub","Sheraton Hub","Shobra Hub","Shorouk Hub","Smouha Hub","Sohag Hub","Suez Hub","Tanta Hub","Zahraa El Maadi Hub","Zahraa Nasr City Hub"];
 const ACTIONS=["Yes","No","Wrong Data","Duplicated","Contractor Termination","Another Contractor"];
 const IMG_LABELS={front:"وجه البطاقة والرخص",back:"ظهر البطاقة والرخص",personal:"صورة شخصية",vehicle:"صورة المركبة"};
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -216,7 +231,7 @@ const opts=(arr,first)=>(first!==undefined?`<option value="">${first}</option>`:
 $("#a_hub").innerHTML=opts(HUBS,"كل الفروع");
 $$(".actionFilter").forEach(s=>s.innerHTML=`<option value="">الكل</option><option value="__none">قيد المراجعة</option>`+opts(ACTIONS));
 
-let session=null,isAdmin=false,reps=[],offices=[];
+let session=null,isAdmin=false,reps=[],offices=[],hubCodes={},officeCodes={};
 const files={front:[],back:[],personal:[],vehicle:[]};
 const imgCache={};
 function status(t){const s=$("#status");s.hidden=!t;s.textContent=t||""}
@@ -279,7 +294,7 @@ function refreshDate(){if($("#f_date").value!==todayCairo())$("#f_date").value=t
 refreshDate();setInterval(refreshDate,60000);document.addEventListener("visibilitychange",refreshDate);
 
 // ===== Hub search (Arabic + English) =====
-const HUB_AR={"03DSP-Elsadat Hub":"السادات","3rd settelment":"التجمع التالت التجمع الثالث","Al Waha hub":"الواحة","Alexandria Hub":"اسكندرية الاسكندرية","Asher Hub":"العاشر من رمضان","Assiut Hub":"اسيوط","Aswan Hub":"اسوان","Banha Hub":"بنها","Bani Mazar Hub":"بني مزار","Behira Hub":"البحيرة","Beni Suef Hub":"بني سويف","Dikernis Hub":"دكرنس","Domiatta Hub":"دمياط","Downtown Hub":"وسط البلد","Edfo Hub":"ادفو","El Obour Hub":"العبور","El Quseir Hub":"القصير","ElAgamy Hub":"العجمي","ElMahala Hub":"المحلة","El-Mansoura Hub":"المنصورة","El-Sharkia Hub":"الشرقية الزقازيق","Faisal Hub":"فيصل","Faqous Hub":"فاقوس","Fayoum Hub":"الفيوم","Gesr Elsuez Hub":"جسر السويس","Hadayk El Ahram Hub":"حدائق الاهرام","Hadayk October":"حدائق اكتوبر","Haram Hub":"الهرم","Hawamdya Hub":"الحوامدية","Heliopolis Hub":"مصر الجديدة","Helwan Hub":"حلوان","Huarghada Hub":"الغردقة","Imbaba Hub":"امبابة","Inventory Hub":"المخزن","Ismailia Hub":"الاسماعيلية","Kafrelsheikh Hub":"كفر الشيخ","Katamya-New Hub":"القطامية","Khorshid Hub":"خورشيد","Luxor Hub":"الاقصر","Maadi Hub":"المعادي","Madinaty Hub":"مدينتي","Mansoura-Talkha Hub":"المنصورة طلخا","Marg Hub":"المرج","Matrouh Hub":"مطروح","Minya Hub":"المنيا","Mohandseen Hub":"المهندسين","Mokattam Hub":"المقطم","Monufia Hub":"المنوفية","Nagaa Hammadi Hub":"نجع حمادي","Nasr City Hub":"مدينة نصر","New Cairo Hub":"القاهرة الجديدة","New October Hub":"اكتوبر الجديدة","New Valley Hub":"الوادي الجديد","October Hub":"اكتوبر","Port Said Hub":"بورسعيد","Qalyoub Hub":"قليوب","Qena Hub":"قنا","Sharm EL Sheikh Hub":"شرم الشيخ","Sheraton Hub":"شيراتون","Shobra Hub":"شبرا","Shorouk Hub":"الشروق","Smouha Hub":"سموحة","Sohag Hub":"سوهاج","Suez Hub":"السويس","Tanta Hub":"طنطا","Zahraa El Maadi Hub":"زهراء المعادي","Zahraa Nasr City Hub":"زهراء مدينة نصر"};
+let HUB_AR={"3rd settelment":"التجمع التالت التجمع الثالث","Al Waha hub":"الواحة","Alexandria Hub":"اسكندرية الاسكندرية","Asher Hub":"العاشر من رمضان","Assiut Hub":"اسيوط","Aswan Hub":"اسوان","Banha Hub":"بنها","Bani Mazar Hub":"بني مزار","Behira Hub":"البحيرة","Beni Suef Hub":"بني سويف","Dikernis Hub":"دكرنس","Domiatta Hub":"دمياط","Downtown Hub":"وسط البلد","Edfo Hub":"ادفو","El Obour Hub":"العبور","El Quseir Hub":"القصير","ElAgamy Hub":"العجمي","ElMahala Hub":"المحلة","El-Mansoura Hub":"المنصورة","El-Sharkia Hub":"الشرقية الزقازيق","Faisal Hub":"فيصل","Faqous Hub":"فاقوس","Fayoum Hub":"الفيوم","Gesr Elsuez Hub":"جسر السويس","Hadayk El Ahram Hub":"حدائق الاهرام","Hadayk October":"حدائق اكتوبر","Haram Hub":"الهرم","Hawamdya Hub":"الحوامدية","Heliopolis Hub":"مصر الجديدة","Helwan Hub":"حلوان","Huarghada Hub":"الغردقة","Imbaba Hub":"امبابة","Inventory Hub":"المخزن","Ismailia Hub":"الاسماعيلية","Kafrelsheikh Hub":"كفر الشيخ","Katamya-New Hub":"القطامية","Khorshid Hub":"خورشيد","Luxor Hub":"الاقصر","Maadi Hub":"المعادي","Madinaty Hub":"مدينتي","Mansoura-Talkha Hub":"المنصورة طلخا","Marg Hub":"المرج","Matrouh Hub":"مطروح","Minya Hub":"المنيا","Mohandseen Hub":"المهندسين","Mokattam Hub":"المقطم","Monufia Hub":"المنوفية","Nagaa Hammadi Hub":"نجع حمادي","Nasr City Hub":"مدينة نصر","New Cairo Hub":"القاهرة الجديدة","New October Hub":"اكتوبر الجديدة","New Valley Hub":"الوادي الجديد","October Hub":"اكتوبر","Port Said Hub":"بورسعيد","Qalyoub Hub":"قليوب","Qena Hub":"قنا","Sharm EL Sheikh Hub":"شرم الشيخ","Sheraton Hub":"شيراتون","Shobra Hub":"شبرا","Shorouk Hub":"الشروق","Smouha Hub":"سموحة","Sohag Hub":"سوهاج","Suez Hub":"السويس","Tanta Hub":"طنطا","Zahraa El Maadi Hub":"زهراء المعادي","Zahraa Nasr City Hub":"زهراء مدينة نصر"};
 const normAr=t=>String(t||"").toLowerCase().replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/[\s\-_]+/g," ").trim();
 (function hubPicker(){
  const inp=$("#f_hub"),list=$("#hubList");let idx=-1,shown=[];
@@ -449,7 +464,7 @@ let loading=false;
 async function load(){
  if(!session||loading)return;loading=true;
  if(!reps.length)status("جاري تحميل البيانات…");
- try{const j=await api("list");reps=j.reps||[];offices=j.offices||[];status("")}
+ try{const j=await api("list");reps=j.reps||[];offices=j.offices||[];hubCodes=j.hubCodes||hubCodes;officeCodes=j.officeCodes||officeCodes;status("")}
  catch(err){status("تعذر تحميل البيانات: "+err.message)}
  loading=false;render();
 }
@@ -481,7 +496,7 @@ function render(){
  const a=filtered(reps,"a");counts(reps,"#a_counts");
  $("#a_body").innerHTML=a.length?a.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.office)}</td><td>${esc(r.name)}</td><td dir="ltr">${esc(r.phone)}</td><td dir="ltr">${esc(r.nid)}</td><td>${esc(r.hub)}</td><td>${esc(r.vehicleType)}</td>
   <td><select data-act="${esc(r.id)}" aria-label="Action"><option value="">قيد المراجعة</option>${ACTIONS.map(x=>`<option ${r.action===x?"selected":""}>${x}</option>`).join("")}</select></td>
-  <td><button class="link" data-view="${esc(r.id)}">التفاصيل</button></td></tr>`).join("")
+  <td class="rowbtns"><button class="link" data-view="${esc(r.id)}">التفاصيل</button><button class="sysbtn" type="button" data-sys="${esc(r.id)}" title="بيانات السيستم" aria-label="بيانات السيستم"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></td></tr>`).join("")
   :`<tr><td colspan="9" class="empty">${reps.length?"لا نتائج لهذه الفلاتر":"لم ترفع المكاتب أي بيانات بعد"}</td></tr>`;
 }
 ["m_search","m_action","a_search","a_office","a_hub","a_action"].forEach(id=>$("#"+id).addEventListener("input",render));
@@ -508,6 +523,36 @@ document.addEventListener("click",e=>{
  const c=e.target.closest("[data-close]");if(c)c.closest("dialog").close();
 });
 
+// ===== System data (copy to the work system) =====
+function sysData(r){
+ const digits=String(r.plate||"").replace(/[٠-٩]/g,c=>c.charCodeAt(0)-1632);
+ const letters=digits.replace(/[\d\s\-]/g,""),nums=digits.replace(/\D/g,"");
+ const g=String(r.nid||"").length===14?(+r.nid[12]%2?"Male":"Female"):"";
+ const hc=hubCodes[r.hub]||"",oc=officeCodes[r.office]||"";
+ return [
+  ["General Info",[["First name",hc&&r.nameEn?hc+r.nameEn:"",!hc?"كود الفرع مش موجود في تابة Codes":!r.nameEn?"الاسم بالإنجليزي مش موجود":""],["Last name",oc,!oc?"كود المكتب مش موجود في تابة Codes":""],["Arabic name",r.name],["Gender",g],["Phone",r.phone],["National Number",r.nid]]],
+  ["LM Info",[["Contractor",r.office],["Hired By","Contractor"],["Hub",r.hub],["Fleet Type","Last Mile"]]],
+  ["Vehicle",[["Vehicle Type",r.vehicleType],["Brand",r.vehicleModel],["License",letters],["Year",r.vehicleYear],["Plate Number",nums]]],
+  ["Address",[["City","Cairo"],["Area","Abdeen"],["Street Name",r.nid]]]
+ ];
+}
+async function copyText(t,btn){
+ try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.append(ta);ta.select();document.execCommand("copy");ta.remove()}
+ if(btn){const o=btn.textContent;btn.textContent="اتنسخ ✓";btn.classList.add("done");setTimeout(()=>{btn.textContent=o;btn.classList.remove("done")},1400)}
+}
+let sysCurrent=null;
+function openSys(r){
+ sysCurrent=sysData(r);
+ $("#s_title").textContent="بيانات السيستم: "+r.name;
+ $("#s_body").innerHTML=sysCurrent.map(([sec,rows])=>`<div class="sys-sec"><h3 dir="ltr">${sec}</h3>${rows.map(([k,v,warn])=>`<div class="sys-row"><span class="k">${k}</span><span class="v${v?"":" empty"}" dir="auto">${v?esc(v):esc(warn||"—")}</span>${v?`<button class="cp" type="button" data-copy="${esc(v)}">نسخ</button>`:"<span></span>"}</div>`).join("")}</div>`).join("");
+ $("#sys").showModal();
+}
+$("#copyAll").onclick=e=>{if(!sysCurrent)return;copyText(sysCurrent.map(([sec,rows])=>sec+"\n"+rows.map(([k,v])=>k+": "+(v||"")).join("\n")).join("\n\n"),e.currentTarget)};
+document.addEventListener("click",e=>{
+ const b=e.target.closest("[data-sys]");if(b){const r=reps.find(x=>x.id===b.dataset.sys);if(r)openSys(r);return}
+ const c=e.target.closest("[data-copy]");if(c)copyText(c.dataset.copy,c);
+});
+
 $("#exportBtn").onclick=()=>{
  const rows=filtered(reps,"a"),cols=["date","office","name","phone","nid","hub","vehicleType","vehicleModel","plate","vehicleYear","action"];
  const head=["تاريخ الرفع","المكتب","المندوب","الهاتف","الرقم القومي","الفرع","نوع المركبة","الموديل","اللوحة","سنة الصنع","Action"];
@@ -516,7 +561,14 @@ $("#exportBtn").onclick=()=>{
  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="reps-"+new Date().toISOString().slice(0,10)+".csv";a.click();
 };
 
-applySession();
+async function loadConfig(){
+ try{
+  const j=await api("config");
+  if(j.hubs&&j.hubs.length){HUBS=j.hubs.map(h=>h.name);HUB_AR={};j.hubs.forEach(h=>HUB_AR[h.name]=h.ar||"");
+   const cur=$("#a_hub").value;$("#a_hub").innerHTML=opts(HUBS,"كل الفروع");$("#a_hub").value=cur}
+ }catch(e){}
+}
+applySession();loadConfig();
 
 </script>
 </body>
