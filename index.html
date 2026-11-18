@@ -91,6 +91,14 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 .bm-link{flex:none;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;padding:8px 14px;border-radius:8px;cursor:grab;white-space:nowrap}
 @media (max-width:560px){.sys-row{grid-template-columns:1fr auto}.sys-row .k{grid-column:1/-1;text-align:start}}
 [hidden]{display:none!important}
+:root[data-theme="dark"]{--bg:#15171b;--surface:#1e2127;--ink:#eceef2;--muted:#9aa1ad;--line:#2f333b;--soft:#3a1d20;--ok:#5fd39a;--okbg:#173527;--warn:#f0b75a;--warnbg:#3a2c12;--bad:#ff7b82;--badbg:#3d1a1d;--neu:#c3c8d0;--neubg:#2a2e35;color-scheme:dark}
+:root[data-theme="dark"] .login-card{background:rgba(30,33,39,.95);color:#eceef2}
+:root[data-theme="dark"] .login-card label{color:#eceef2}
+:root[data-theme="dark"] .login-card input,:root[data-theme="dark"] .lang-btn{background:#15171b;color:#eceef2;border-color:#2f333b}
+.ui-ctl{display:flex;gap:6px;margin:0 0 12px}
+.ui-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.ui-btn:hover{border-color:var(--muted)}
+.login-row .ui-btn{padding:4px 10px;font-size:12px}
 #login{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:max(20px,env(safe-area-inset-top,0px)) 16px max(20px,env(safe-area-inset-bottom,0px));overflow:auto;
  background:
   repeating-linear-gradient(135deg,transparent 0 46px,rgba(196,120,90,.18) 46px 50px,transparent 50px 96px),
@@ -113,6 +121,7 @@ input[readonly]{opacity:.8;cursor:not-allowed}
 <body>
 <header><div class="bar">
  <h1>تسجيل المناديب</h1>
+ <div class="ui-ctl"><button class="ui-btn" type="button" data-lang-toggle>English 🌐</button><button class="ui-btn" type="button" data-theme-toggle>☾ Dark</button></div>
  <div class="who" id="who" hidden><span id="whoName"></span><button class="btn" id="logoutBtn" type="button">تسجيل خروج</button></div>
  <nav role="tablist" id="tabs" hidden>
   <button role="tab" data-tab="form" aria-selected="true" class="officeTab">تسجيل مندوب</button>
@@ -129,7 +138,7 @@ input[readonly]{opacity:.8;cursor:not-allowed}
   <h2 data-l="title">Sign in</h2>
   <label for="l_user" data-l="email">Email</label><input id="l_user" type="email" dir="ltr" autocomplete="username">
   <label for="l_pass" data-l="pass">Password</label><input id="l_pass" type="password" dir="ltr" autocomplete="current-password">
-  <div class="login-row"><button class="login-btn" type="submit" data-l="btn">Login</button><button class="lang-btn" type="button" id="langBtn">🌐 العربية / English</button></div>
+  <div class="login-row"><button class="login-btn" type="submit" data-l="btn">Login</button><span style="display:flex;gap:6px"><button class="ui-btn" type="button" id="langBtn" data-lang-toggle>English 🌐</button><button class="ui-btn" type="button" data-theme-toggle>☾ Dark</button></span></div>
   <span id="loginMsg" role="status"></span>
  </form>
 </section>
@@ -254,7 +263,7 @@ $$("nav button").forEach(b=>b.onclick=()=>{
 const LT={en:{title:"Sign in",email:"Email",pass:"Password",btn:"Login",err:"Wrong email or password",wait:"Signing in…"},ar:{title:"تسجيل الدخول",email:"البريد الإلكتروني",pass:"كلمة السر",btn:"دخول",err:"الإيميل أو كلمة السر غلط",wait:"جاري الدخول…"}};
 let lang="en";
 function setLang(l){lang=l;$("#loginForm").dir=l==="ar"?"rtl":"ltr";$$("#loginForm [data-l]").forEach(el=>el.textContent=LT[l][el.dataset.l]);$("#loginMsg").textContent=""}
-$("#langBtn").onclick=()=>setLang(lang==="en"?"ar":"en");
+$("#langBtn").onclick=()=>setUILang(uiLang==="en"?"ar":"en");
 function applySession(){
  isAdmin=session?.role==="admin";
  const off=!!session&&!isAdmin;
@@ -300,7 +309,7 @@ const normAr=t=>String(t||"").toLowerCase().replace(/[أإآ]/g,"ا").replace(/�
   const q=normAr(inp.value);
   shown=HUBS.filter(h=>!q||normAr(h+" "+(HUB_AR[h]||"")).includes(q));
   idx=-1;
-  list.innerHTML=shown.length?shown.map((h,i)=>`<li role="option" data-i="${i}">${esc(h)}<span>${esc(HUB_AR[h]||"")}</span></li>`).join(""):`<li class="none">مفيش فرع بالاسم ده</li>`;
+  list.innerHTML=shown.length?shown.map((h,i)=>`<li role="option" data-i="${i}">${esc(h)}<span class="noi18n">${esc(HUB_AR[h]||"")}</span></li>`).join(""):`<li class="none">مفيش فرع بالاسم ده</li>`;
   list.hidden=false;
  };
  const pick=h=>{inp.value=h;list.hidden=true};
@@ -486,13 +495,13 @@ function render(){
  if(!session)return;
  if(!isAdmin){
   const m=filtered(reps,"m");counts(reps,"#m_counts");
-  $("#m_body").innerHTML=m.length?m.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.office)}</td><td>${esc(r.name)}</td><td dir="ltr">${esc(r.phone)}</td><td>${esc(r.hub)}</td><td>${esc(r.vehicleType)}</td><td>${chip(r.action)}</td><td><button class="link" data-view="${esc(r.id)}">التفاصيل</button></td></tr>`).join("")
+  $("#m_body").innerHTML=m.length?m.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.office)}</td><td class="noi18n">${esc(r.name)}</td><td dir="ltr">${esc(r.phone)}</td><td>${esc(r.hub)}</td><td>${esc(r.vehicleType)}</td><td>${chip(r.action)}</td><td><button class="link" data-view="${esc(r.id)}">التفاصيل</button></td></tr>`).join("")
    :`<tr><td colspan="8" class="empty">${reps.length?"لا نتائج لهذا البحث":"لم تسجل أي مندوب بعد. ابدأ من تبويب «تسجيل مندوب»."}</td></tr>`;
   return;
  }
  const cur=$("#a_office").value;$("#a_office").innerHTML=opts(offices,"كل المكاتب");$("#a_office").value=cur;
  const a=filtered(reps,"a");counts(reps,"#a_counts");
- $("#a_body").innerHTML=a.length?a.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.office)}</td><td>${esc(r.name)}</td><td dir="ltr">${esc(r.phone)}</td><td dir="ltr">${esc(r.nid)}</td><td>${esc(r.hub)}</td><td>${esc(r.vehicleType)}</td>
+ $("#a_body").innerHTML=a.length?a.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.office)}</td><td class="noi18n">${esc(r.name)}</td><td dir="ltr">${esc(r.phone)}</td><td dir="ltr">${esc(r.nid)}</td><td>${esc(r.hub)}</td><td>${esc(r.vehicleType)}</td>
   <td><select data-act="${esc(r.id)}" aria-label="Action"><option value="">قيد المراجعة</option>${ACTIONS.map(x=>`<option ${r.action===x?"selected":""}>${x}</option>`).join("")}</select></td>
   <td class="rowbtns"><button class="link" data-view="${esc(r.id)}">التفاصيل</button><button class="sysbtn" type="button" data-sys="${esc(r.id)}" title="بيانات السيستم" aria-label="بيانات السيستم"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></td></tr>`).join("")
   :`<tr><td colspan="9" class="empty">${reps.length?"لا نتائج لهذه الفلاتر":"لم ترفع المكاتب أي بيانات بعد"}</td></tr>`;
@@ -512,7 +521,7 @@ document.addEventListener("click",e=>{
  if(v){const r=reps.find(x=>x.id===v.dataset.view);if(!r)return;
   $("#d_title").textContent=r.name;
   const kv=[["تاريخ الرفع",r.date],["المكتب",r.office],["الاسم بالإنجليزي",r.nameEn],["الهاتف",r.phone],["الرقم القومي",r.nid],["الفرع",r.hub],["نوع المركبة",r.vehicleType],["العربية/الموتوسيكل",brandFmt(r.vehicleModel)],["رقم اللوحة",r.plate],["سنة الصنع",r.vehicleYear]];
-  $("#d_body").innerHTML=`<p>${chip(r.action)}</p><div class="kv">${kv.map(([k,x])=>`<div><span>${k}</span>${esc(x)}</div>`).join("")}</div>`+
+  $("#d_body").innerHTML=`<p>${chip(r.action)}</p><div class="kv">${kv.map(([k,x])=>`<div><span>${k}</span><b class="noi18n" style="font-weight:500">${esc(x)}</b></div>`).join("")}</div>`+
    Object.keys(IMG_LABELS).map(k=>`<div class="gal"><h4>${IMG_LABELS[k]}</h4><div class="thumbs">${(r.images?.[k]||[]).map(id=>`<img data-imgid="${esc(id)}" alt="${IMG_LABELS[k]}">`).join("")||"<span class='note'>لا توجد صور</span>"}</div></div>`).join("");
   $$("#d_body img[data-imgid]").forEach(async im=>{const id=im.dataset.imgid;try{imgCache[id]=imgCache[id]||(await api("image",{id})).data;im.src=imgCache[id]}catch(e){}});
   $("#detail").showModal();return}
@@ -543,7 +552,7 @@ let sysCurrent=null;
 function openSys(r){
  sysCurrent=sysData(r);sysRep=r;prepImages(r);
  $("#s_title").textContent="بيانات السيستم: "+r.name;
- $("#s_body").innerHTML=sysCurrent.map(([sec,rows])=>`<div class="sys-sec"><h3 dir="ltr">${sec}</h3>${rows.map(([k,v,warn])=>`<div class="sys-row"><span class="k">${k}</span><span class="v${v?"":" empty"}" dir="auto">${v?esc(v):esc(warn||"—")}</span>${v?`<button class="cp" type="button" data-copy="${esc(v)}">نسخ</button>`:"<span></span>"}</div>`).join("")}</div>`).join("");
+ $("#s_body").innerHTML=sysCurrent.map(([sec,rows])=>`<div class="sys-sec"><h3 dir="ltr">${sec}</h3>${rows.map(([k,v,warn])=>`<div class="sys-row"><span class="k">${k}</span><span class="v noi18n${v?"":" empty"}" dir="auto">${v?esc(v):esc(warn||"—")}</span>${v?`<button class="cp" type="button" data-copy="${esc(v)}">نسخ</button>`:"<span></span>"}</div>`).join("")}</div>`).join("");
  $("#sys").showModal();
 }
 let sysRep=null;
@@ -600,6 +609,55 @@ async function loadConfig(){
    const cur=$("#a_hub").value;$("#a_hub").innerHTML=opts(HUBS,"كل الفروع");$("#a_hub").value=cur}
  }catch(e){}
 }
+// ===== Language (Arabic / English) and theme (light / dark) =====
+const EN={"دوس «نسخ الكل» واستنى لحد ما يكتب «اتنسخ». 2) افتح صفحة إضافة المندوب في السيستم. 3) دوس «تعبئة بوسطة» من شريط المفضلة: البيانات هتتملى وصور البطاقة والرخص هتترفع في National ID. الصورة الشخصية ارفعها بإيدك.": "Press “Copy all” and wait until it says “Copied”. 2) Open the add-star page in the system. 3) Press “Bosta Fill” in your bookmarks bar: the data fills in and the ID and license photos upload to National ID. Upload the personal photo yourself.", "أول مرة بس: اسحب زرار «تعبئة بوسطة» بالماوس وحطه في شريط المفضلة. لو الشريط مش ظاهر اعمل Ctrl + Shift + B.": "First time only: drag the “Bosta Fill” button to your bookmarks bar. If the bar is hidden, press Ctrl + Shift + B.", "ارفع صور البطاقة والرخص الأول علشان الرقم القومي وبيانات المركبة يتملوا لوحدهم": "Upload the ID and license photos first so the national ID and vehicle details fill in automatically", "اسحب الزرار ده بالماوس وحطه في شريط المفضلة (Bookmarks bar) فوق في المتصفح.": "Drag this button with your mouse onto the browser's bookmarks bar.", "صورة المركبة لازم يكون فيها رقم اللوحة واضح ومطابق للرخصة": "The vehicle photo must show a clear plate that matches the license", "ارفع صور الوش والضهر علشان نقرا بيانات رخصة المركبة.": "Upload the front and back photos so we can read the vehicle license.", "لم تسجل أي مندوب بعد. ابدأ من تبويب «تسجيل مندوب».": "You haven't registered any stars yet. Start from the “Register star” tab.", "جاري قراءة الرقم القومي وبيانات المركبة من الصور": "Reading the national ID and vehicle details from the photos", "رقم اللوحة مش مطابق بين الرخصة وصورة المركبة": "The plate number doesn't match between the license and the vehicle photo", "صورة واحدة، ولازم رقم اللوحة يكون واضح فيها": "One photo; the plate number must be clearly visible", "ظهر البطاقة + رخصة القيادة + رخصة المركبة": "Back of ID + driving license + vehicle license", "وجه البطاقة + رخصة القيادة + رخصة المركبة": "Front of ID + driving license + vehicle license", "الصورة مرفوضة: رقم اللوحة في صورة المركبة": "Photo rejected: the plate number in the vehicle photo", "اكتب اسم الفرع بالعربي أو بالإنجليزي": "Type the hub name in Arabic or English", "استنى لحد ما الاسم يتكتب بالإنجليزي": "Wait until the English name is filled in", "رقم الهاتف لازم يكون 11 رقم بالظبط": "Phone number must be exactly 11 digits", "لم يتم ضبط رابط الـ API في الصفحة": "The API link isn't set in the page", "بحث بالاسم أو الهاتف أو البطاقة": "Search by name, phone or ID", "مش مطابق لرقم اللوحة في الرخصة": "doesn't match the plate number on the license", "لم ترفع المكاتب أي بيانات بعد": "No offices have uploaded data yet", "هتتطابق مع الرخصة لما تترفع)": "will be matched with the license once uploaded)", "انتهت الجلسة، سجّل دخول تاني": "Session expired, please sign in again", "التعبئة التلقائية في السيستم": "Auto-fill in the system", "بيتكتب لوحده من الاسم العربي": "Filled automatically from the Arabic name", "لازم صور الرخصة تتقري الأول": "The license photos must be read first", "جاري كتابة الاسم بالإنجليزي": "Writing the name in English", "اللوحة ظاهرة ومطابقة للرخصة": "Plate visible and matches the license", "كود المكتب مش موجود في تابة": "Office code is missing from the tab", "تعذر كتابة الاسم بالإنجليزي": "Couldn't write the name in English", "مش قادرين نقرا رخصة المركبة": "We can't read the vehicle license", "صوّر المركبة واللوحة واضحة.": "Take a photo of the vehicle with the plate clearly visible.", "جاري التأكد من ظهور اللوحة": "Checking the plate is visible", "كود الفرع مش موجود في تابة": "Hub code is missing from the tab", "الاسم بالإنجليزي مش موجود": "English name is missing", "نوع العربية أو الموتوسيكل": "Car or motorbike model", "الإيميل أو كلمة السر غلط": "Wrong email or password", "أكمل كل الحقول المطلوبة": "Fill in all required fields", "تم إرسال بيانات المندوب": "Star data submitted", "ارفع صورة أوضح للرخصة.": "Upload a clearer photo of the license.", "اكتب اسم المندوب رباعي": "Enter the star's full four-part name", "سجّل دخول المكتب الأول": "Sign in as an office first", "اسم المندوب بالإنجليزي": "Star name in English", "اختار الفرع من القايمة": "Choose a hub from the list", "اسم، هاتف، بطاقة، لوحة": "Name, phone, ID, plate", "لا نتائج لهذه الفلاتر": "No results for these filters", "نسخ الكل (من غير صور)": "Copy all (without photos)", "ملف الصورة غير مقروء": "Image file can't be read", "الفرع الذي سيعمل به": "Hub the star will work at", "لا نتائج لهذا البحث": "No results for this search", "جاري تحميل البيانات": "Loading data", "تعذر تحميل البيانات": "Couldn't load data", "تاريخ رفع البيانات": "Submission date", "صورة شخصية للمندوب": "Star's personal photo", "اكتب الاسم بالعربي": "Type the name in Arabic", "رقم اللوحة مش ظاهر": "Plate number not visible", "العربية/الموتوسيكل": "Car/motorbike", "ظهر البطاقة والرخص": "Back of ID and licenses", "وجه البطاقة والرخص": "Front of ID and licenses", "مفيش فرع بالاسم ده": "No hub with that name", "تعذر قراءة الرخصة": "Couldn't read the license", "اسم المندوب رباعي": "Star full name (four parts)", "البيانات مش واضحة": "The details aren't clear", "البريد الإلكتروني": "Email", "بيتملى من البطاقة": "Filled from the ID card", "بيتملى من الرخصة": "Filled from the license", "الاسم بالإنجليزي": "English name", "جاري تجهيز الصور": "Preparing photos", "رقم لوحة المركبة": "Vehicle plate number", "سنة صنع المركبة": "Vehicle manufacture year", "تعذر فحص الصورة": "Couldn't check the photo", "بيانات السيستم": "System data", "إرسال البيانات": "Submit", "تسجيل المناديب": "Star Registration", "بيانات المركبة": "Vehicle details", "بيانات المندوب": "Star details", "الصورة مرفوضة": "Photo rejected", "حالة المراجعة": "Review status", "بيانات المكتب": "Office details", "مناديب مكتبي": "My office's stars", "اللوحة ظاهرة": "Plate visible", "صورة المركبة": "Vehicle photo", "تسجيل الدخول": "Sign in", "قيد المراجعة": "Under review", "تعذر حفظ الـ": "Couldn't save the", "جاري الإرسال": "Submitting", "، رقم اللوحة": ", plate", "الرقم القومي": "National ID", "تسجيل مندوب": "Register star", "تعبئة بوسطة": "Bosta Fill", "، سنة الصنع": ", year", "تاريخ الرفع": "Submitted on", "لا توجد صور": "No photos", "نوع المركبة": "Vehicle type", "جاري الدخول": "Signing in", "ارفع 3 صور": "Upload 3 photos", "رقم اللوحة": "Plate number", "صورة شخصية": "Personal photo", "شيل الصورة": "Remove photo", "تعذر الحفظ": "Couldn't save", "اسم المكتب": "Office name", "تسجيل خروج": "Sign out", "كل المكاتب": "All offices", "صورة واحدة": "One photo", "رقم الهاتف": "Phone number", "غير مقروء": "unreadable", "كل الفروع": "All hubs", "كلمة السر": "Password", "، المركبة": ", vehicle", "حاول تاني": "Try again", "سنة الصنع": "Year", "نسخ الكل": "Copy all", "الإجمالي": "Total", "التفاصيل": "Details", "التاريخ": "Date", "المندوب": "Star", "المركبة": "Vehicle", "الموديل": "Model", "البطاقة": "ID", "الهاتف": "Phone", "الأدمن": "Admin", "اللوحة": "Plate", "المكتب": "Office", "إغلاق": "Close", "الصور": "Photos", "اتنسخ": "Copied", "الفرع": "Hub", "تصدير": "Export", "الكل": "All", "ارفع": "Upload", "مكتب": "Office", "اختر": "Choose", "دخول": "Login", "نسخ": "Copy", "بحث": "Search", "من الرخصة": "From the license", "المطلوبة": "required", "اتملى كل حاجة": "Everything filled"};
+const EN_KEYS=Object.keys(EN).sort((a,b)=>b.length-a.length);
+const AR_RE=/[\u0600-\u06FF]/;
+let uiLang="ar";
+const trMap=new WeakMap();
+function tr(t){let o=t;for(const k of EN_KEYS)if(o.includes(k))o=o.split(k).join(EN[k]);return o}
+function skip(n){const p=n.parentElement;return !p||p.closest("script,style,textarea,.noi18n")}
+function trNode(n){
+ if(n.nodeType===3){
+  if(skip(n))return;
+  const m=trMap.get(n);
+  if(uiLang==="en"){
+   const src=m&&n.nodeValue===m.t?m.o:n.nodeValue;
+   if(!AR_RE.test(src))return;
+   const t=tr(src);trMap.set(n,{o:src,t});if(n.nodeValue!==t)n.nodeValue=t;
+  }else if(m){if(n.nodeValue===m.t)n.nodeValue=m.o;trMap.delete(n)}
+  return;
+ }
+ if(n.nodeType!==1||n.closest("script,style,.noi18n"))return;
+ for(const a of ["placeholder","title","aria-label"]){
+  if(!n.hasAttribute(a))continue;
+  const key="data-ar-"+a,v=n.getAttribute(a);
+  if(uiLang==="en"){const src=n.hasAttribute(key)&&v===n.getAttribute(key+"-en")?n.getAttribute(key):v;if(AR_RE.test(src)){const t=tr(src);n.setAttribute(key,src);n.setAttribute(key+"-en",t);if(v!==t)n.setAttribute(a,t)}}
+  else if(n.hasAttribute(key)){if(v===n.getAttribute(key+"-en"))n.setAttribute(a,n.getAttribute(key));n.removeAttribute(key);n.removeAttribute(key+"-en")}
+ }
+ for(const c of n.childNodes)trNode(c);
+}
+let trBusy=false;
+new MutationObserver(ms=>{if(trBusy||uiLang!=="en")return;trBusy=true;for(const m of ms){if(m.type==="characterData")trNode(m.target);else m.addedNodes.forEach(trNode);if(m.type==="attributes")trNode(m.target)}trBusy=false})
+ .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label"]});
+const _alert=window.alert.bind(window);window.alert=m=>_alert(uiLang==="en"?tr(String(m)):m);
+function setUILang(l){
+ uiLang=l;document.documentElement.lang=l;document.documentElement.dir=l==="en"?"ltr":"rtl";
+ trBusy=true;trNode(document.body);trBusy=false;
+ $$("[data-lang-toggle]").forEach(b=>b.textContent=l==="en"?"العربية 🌐":"English 🌐");
+ setLang(l);if(l==="en"){trBusy=true;trNode($("#loginForm"));trBusy=false}
+ try{localStorage.setItem("ui_lang",l)}catch(e){}
+}
+function setTheme(t){
+ document.documentElement.setAttribute("data-theme",t);
+ $$("[data-theme-toggle]").forEach(b=>b.textContent=t==="dark"?"☀ Light":"☾ Dark");
+ try{localStorage.setItem("ui_theme",t)}catch(e){}
+}
+$$("[data-lang-toggle]").forEach(b=>b.onclick=()=>setUILang(uiLang==="en"?"ar":"en"));
+$$("[data-theme-toggle]").forEach(b=>b.onclick=()=>setTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark"));
+try{setTheme(localStorage.getItem("ui_theme")||"light")}catch(e){setTheme("light")}
+try{if(localStorage.getItem("ui_lang")==="en")setTimeout(()=>setUILang("en"),0)}catch(e){}
+
 applySession();loadConfig();
 
 </script>
