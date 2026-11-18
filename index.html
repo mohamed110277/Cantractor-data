@@ -153,14 +153,14 @@ input[readonly]{opacity:.8;cursor:not-allowed}
    <div><label for="f_name">اسم المندوب رباعي <span class="req">*</span></label><input id="f_name" required autocomplete="off" placeholder="اكتب الاسم بالعربي"><div id="nameMsg" class="msg" role="status"></div></div>
    <div><label for="f_name_en">اسم المندوب بالإنجليزي <span class="req">*</span></label><input id="f_name_en" required readonly dir="ltr" placeholder="بيتكتب لوحده من الاسم العربي"></div>
    <div><label for="f_phone">رقم الهاتف <span class="req">*</span></label><input id="f_phone" required autocomplete="off" inputmode="numeric" dir="ltr" maxlength="11" pattern="\d{11}" placeholder="01xxxxxxxxx"></div>
-   <div><label for="f_nid">الرقم القومي <span class="req">*</span></label><input id="f_nid" required autocomplete="off" inputmode="numeric" dir="ltr" maxlength="14" pattern="\d{14}" placeholder="14 رقم"></div>
+   <div><label for="f_nid">الرقم القومي <span class="req">*</span></label><input id="f_nid" required readonly dir="ltr" placeholder="بيتملى من البطاقة"></div>
    <div><label for="f_hub">الفرع الذي سيعمل به <span class="req">*</span></label><div class="combo"><input id="f_hub" required autocomplete="off" placeholder="اكتب اسم الفرع بالعربي أو بالإنجليزي" role="combobox" aria-controls="hubList" aria-autocomplete="list"><ul id="hubList" role="listbox" hidden></ul></div></div>
   </div>
  </fieldset>
  <fieldset><legend>بيانات المركبة</legend>
   <div class="grid">
    <div><label for="f_vtype">نوع المركبة <span class="req">*</span></label><select id="f_vtype" required>
-     <option value="">اختر</option><option>Van</option><option>Sedan</option><option>Motorbike</option><option>Tricycle</option></select></div>
+     <option value="">اختر</option><option>Sedan</option><option>Motorbike</option><option>Tricycle</option></select></div>
    <div><label for="f_model">نوع العربية أو الموتوسيكل <span class="req">*</span></label><input id="f_model" required readonly placeholder="بيتملى من الرخصة"></div>
    <div><label for="f_plate">رقم لوحة المركبة <span class="req">*</span></label><input id="f_plate" required readonly placeholder="بيتملى من الرخصة"></div>
    <div><label for="f_year">سنة صنع المركبة <span class="req">*</span></label><input id="f_year" required readonly dir="ltr" placeholder="بيتملى من الرخصة"></div>
@@ -214,7 +214,7 @@ input[readonly]{opacity:.8;cursor:not-allowed}
 </section>
 </main>
 
-<dialog id="sys"><div class="dlg-h"><strong id="s_title">بيانات السيستم</strong><div class="actions"><button class="btn primary" type="button" id="copyAll">نسخ الكل</button><button class="btn" data-close>إغلاق</button></div></div><div class="dlg-b"><div class="bm-box"><div><strong>التعبئة التلقائية في السيستم</strong><p>1) دوس «نسخ الكل». 2) افتح صفحة إضافة المندوب في السيستم. 3) دوس زرار «تعبئة بوسطة» من شريط المفضلة، وكل خانة هتتملى لوحدها.</p></div><a id="bmLink" class="bm-link" href="#" draggable="true">⬇ تعبئة بوسطة</a></div><div id="s_body"></div><p class="note" style="margin-top:12px">أول مرة بس: اسحب زرار «تعبئة بوسطة» بالماوس وحطه في شريط المفضلة. لو الشريط مش ظاهر اعمل Ctrl + Shift + B.</p></div></dialog>
+<dialog id="sys"><div class="dlg-h"><strong id="s_title">بيانات السيستم</strong><div class="actions"><button class="btn primary" type="button" id="copyAll">نسخ الكل</button><button class="btn" data-close>إغلاق</button></div></div><div class="dlg-b"><div class="bm-box"><div><strong>التعبئة التلقائية في السيستم</strong><p>1) دوس «نسخ الكل» واستنى لحد ما يكتب «اتنسخ». 2) افتح صفحة إضافة المندوب في السيستم. 3) دوس «تعبئة بوسطة» من شريط المفضلة: البيانات هتتملى وصور البطاقة والرخص هتترفع في National ID. الصورة الشخصية ارفعها بإيدك.</p></div><a id="bmLink" class="bm-link" href="#" draggable="true">⬇ تعبئة بوسطة</a></div><div id="s_body"></div><p class="note" style="margin-top:12px">أول مرة بس: اسحب زرار «تعبئة بوسطة» بالماوس وحطه في شريط المفضلة. لو الشريط مش ظاهر اعمل Ctrl + Shift + B.</p></div></dialog>
 <dialog id="detail"><div class="dlg-h"><strong id="d_title"></strong><button class="btn" data-close>إغلاق</button></div><div class="dlg-b" id="d_body"></div></dialog>
 <dialog id="zoom"><div class="dlg-h"><span></span><button class="btn" data-close>إغلاق</button></div><div class="dlg-b"><img alt=""></div></dialog>
 
@@ -346,7 +346,7 @@ const normPlate=t=>{const x=String(t||"").replace(/[٠-٩]/g,c=>c.charCodeAt(0)-
  return [...x.replace(/\d/g,"")].sort().join("")+"|"+x.replace(/\D/g,"")};
 const samePlate=(a,b)=>!!a&&!!b&&normPlate(a)===normPlate(b);
 function setMsg(id,cls,t){const m=$("#"+id);m.className="msg"+(cls?" "+cls:"");m.textContent=t}
-function clearLic(){lic=null;["f_model","f_plate","f_year"].forEach(id=>$("#"+id).value="")}
+function clearLic(){lic=null;["f_nid","f_model","f_plate","f_year"].forEach(id=>$("#"+id).value="")}
 // small, readable JPEG (one version used for checking and for storage)
 const shrinkCache=new WeakMap();
 function shrink(file){
@@ -387,15 +387,16 @@ let licRun=0;
 async function readLicense(){
  const run=++licRun;clearLic();
  if(!files.front.length||!files.back.length){setMsg("licMsg","",files.front.length||files.back.length?"ارفع صور الوش والضهر علشان نقرا بيانات رخصة المركبة.":"");return}
- setMsg("licMsg","","جاري قراءة نوع المركبة ورقم اللوحة وسنة الصنع من الرخصة…");
+ setMsg("licMsg","","جاري قراءة الرقم القومي وبيانات المركبة من الصور…");
  try{
   const [front,back]=await Promise.all([Promise.all(files.front.map(shrink)),Promise.all(files.back.map(shrink))]);
   const j=await api("readLicense",{images:[...front,...back]});
   if(run!==licRun)return;
   if(!j.found){setMsg("licMsg","err","مش قادرين نقرا رخصة المركبة: "+(j.reason||"البيانات مش واضحة")+". ارفع صورة أوضح للرخصة.");return}
-  lic={plate:j.plate,year:String(j.year),model:j.model,sig:j.sig,data:{front,back}};
+  lic={nid:j.nid,plate:j.plate,year:String(j.year),model:j.model,sig:j.sig,data:{front,back}};
+  $("#f_nid").value=lic.nid;
   $("#f_model").value=lic.model;$("#f_plate").value=lic.plate;$("#f_year").value=lic.year;
-  setMsg("licMsg","ok",`من الرخصة: ${lic.model}، رقم اللوحة ${lic.plate}، سنة الصنع ${lic.year}`);
+  setMsg("licMsg","ok",`الرقم القومي ${lic.nid}، المركبة: ${lic.model}، رقم اللوحة ${lic.plate}، سنة الصنع ${lic.year}`);
   runMatch();
  }catch(err){if(run!==licRun)return;setMsg("licMsg","err","تعذر قراءة الرخصة: "+err.message+" ");const b=document.createElement("button");b.type="button";b.className="link";b.textContent="حاول تاني";b.onclick=readLicense;$("#licMsg").append(b)}
 }
@@ -424,7 +425,7 @@ $$("input[data-img]").forEach(inp=>inp.onchange=()=>{
  renderThumbs(k);afterChange(k);
 });
 // digits only, capped length
-[["f_phone",11],["f_nid",14]].forEach(([id,n])=>$("#"+id).addEventListener("input",e=>{const t=e.target;const d=t.value.replace(/[٠-٩]/g,c=>c.charCodeAt(0)-1632).replace(/\D/g,"").slice(0,n);if(t.value!==d)t.value=d}));
+[["f_phone",11]].forEach(([id,n])=>$("#"+id).addEventListener("input",e=>{const t=e.target;const d=t.value.replace(/[٠-٩]/g,c=>c.charCodeAt(0)-1632).replace(/\D/g,"").slice(0,n);if(t.value!==d)t.value=d}));
 
 $("#repForm").onsubmit=async e=>{
  e.preventDefault();
@@ -435,12 +436,11 @@ $("#repForm").onsubmit=async e=>{
  refreshDate();
  const req=["f_name","f_phone","f_nid","f_hub","f_vtype","f_model","f_plate","f_year"];
  const missing=req.find(id=>!v(id));
- if(missing&&["f_model","f_plate","f_year"].includes(missing))return bad("ارفع صور الرخصة الأول علشان نوع المركبة ورقم اللوحة وسنة الصنع يتملوا لوحدهم");
+ if(missing&&["f_nid","f_model","f_plate","f_year"].includes(missing))return bad("ارفع صور البطاقة والرخص الأول علشان الرقم القومي وبيانات المركبة يتملوا لوحدهم");
  if(missing){bad(missing==="f_hub"?"اختار الفرع من القايمة":"أكمل كل الحقول المطلوبة");$("#"+missing).focus();return}
  if(v("f_name").split(/\s+/).length<4){bad("اكتب اسم المندوب رباعي");$("#f_name").focus();return}
  if(!nameEn||nameEn.ar!==v("f_name").replace(/\s+/g," ")){await translateName();if(!nameEn)return bad("استنى لحد ما الاسم يتكتب بالإنجليزي")}
  if(!/^\d{11}$/.test(v("f_phone"))){bad("رقم الهاتف لازم يكون 11 رقم بالظبط");$("#f_phone").focus();return}
- if(!/^\d{14}$/.test(v("f_nid"))){bad("الرقم القومي لازم يكون 14 رقم بالظبط");$("#f_nid").focus();return}
  if(!HUBS.includes(v("f_hub"))){bad("اختار الفرع من القايمة");$("#f_hub").focus();return}
  const missImg=Object.keys(files).find(k=>!files[k].length);
  if(missImg)return bad("ارفع "+IMG_LABELS[missImg]);
@@ -451,9 +451,9 @@ $("#repForm").onsubmit=async e=>{
  try{
   const personal=await Promise.all(files.personal.map(shrink));
   await api("submit",{
-   rep:{name:v("f_name"),phone:v("f_phone"),nid:v("f_nid"),hub:v("f_hub"),vehicleType:v("f_vtype")},
+   rep:{name:v("f_name"),phone:v("f_phone"),hub:v("f_hub"),vehicleType:v("f_vtype")},
    images:{front:lic.data.front,back:lic.data.back,vehicle:[plateOk.data],personal},
-   proof:{lic:{plate:lic.plate,year:lic.year,model:lic.model,sig:lic.sig},plate:{plate:plateOk.plate,sig:plateOk.sig},name:nameEn}
+   proof:{lic:{nid:lic.nid,plate:lic.plate,year:lic.year,model:lic.model,sig:lic.sig},plate:{plate:plateOk.plate,sig:plateOk.sig},name:nameEn}
   });
   $("#repForm").reset();refreshDate();$("#f_office").value=session.office;
   Object.keys(files).forEach(k=>{files[k]=[];renderThumbs(k)});
@@ -545,13 +545,43 @@ async function copyText(t,btn){
 }
 let sysCurrent=null;
 function openSys(r){
- sysCurrent=sysData(r);
+ sysCurrent=sysData(r);sysRep=r;prepImages(r);
  $("#s_title").textContent="بيانات السيستم: "+r.name;
  $("#s_body").innerHTML=sysCurrent.map(([sec,rows])=>`<div class="sys-sec"><h3 dir="ltr">${sec}</h3>${rows.map(([k,v,warn])=>`<div class="sys-row"><span class="k">${k}</span><span class="v${v?"":" empty"}" dir="auto">${v?esc(v):esc(warn||"—")}</span>${v?`<button class="cp" type="button" data-copy="${esc(v)}">نسخ</button>`:"<span></span>"}</div>`).join("")}</div>`).join("");
  $("#sys").showModal();
 }
-$("#copyAll").onclick=e=>{if(!sysCurrent)return;const o={};sysCurrent.forEach(([,rows])=>rows.forEach(([k,v])=>o[k]=v||""));copyText("BOSTA_REP:"+JSON.stringify(o),e.currentTarget)};
-const BM_CODE="(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));let t=\"\";try{t=await navigator.clipboard.readText()}catch(e){}if(!t||t.indexOf(\"BOSTA_REP:\")!==0){t=prompt(\"الصق بيانات المندوب هنا (Ctrl+V) ثم OK\")||\"\"}if(t.indexOf(\"BOSTA_REP:\")!==0){alert(\"انسخ بيانات المندوب الأول من الداشبورد بزرار (نسخ الكل)\");return}const d=JSON.parse(t.slice(10));const norm=s=>String(s||\"\").replace(/\\s+/g,\" \").trim().toLowerCase();const visible=e=>!!(e.offsetWidth||e.offsetHeight||e.getClientRects().length);function findField(label){const L=norm(label);const els=[...document.querySelectorAll(\"label,span,div,p,h1,h2,h3,h4,h5,h6\")].filter(e=>e.children.length===0&&norm(e.textContent)===L&&visible(e));for(const el of els){let a=el;for(let i=0;i<4&&a;i++){a=a.parentElement;if(!a)break;const f=[...a.querySelectorAll(\"input:not([type=hidden]):not([type=file]),textarea,select,[role=combobox]\")].filter(visible)[0];if(f)return f;}}return null;}function setVal(inp,v){const proto=inp.tagName===\"TEXTAREA\"?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(proto,\"value\").set.call(inp,v);inp.dispatchEvent(new Event(\"input\",{bubbles:true}));inp.dispatchEvent(new Event(\"change\",{bubbles:true}));}async function pickOption(v){const V=norm(v);for(let i=0;i<12;i++){await W(150);const opts=[...document.querySelectorAll(\"[role=option],[class*=option],[class*=Option],li\")].filter(o=>visible(o)&&o.children.length<4);const o=opts.find(o=>norm(o.textContent)===V)||opts.find(o=>norm(o.textContent).includes(V));if(o){o.dispatchEvent(new MouseEvent(\"mousedown\",{bubbles:true}));o.click();return true}}return false;}async function fill(label,v,isSelect){if(!v)return \"skip\";const f=findField(label);if(!f)return false;if(f.tagName===\"SELECT\"){const o=[...f.options].find(o=>norm(o.textContent)===norm(v))||[...f.options].find(o=>norm(o.textContent).includes(norm(v)));if(!o)return false;f.value=o.value;f.dispatchEvent(new Event(\"change\",{bubbles:true}));return true;}if(isSelect){const ctl=f.closest(\"[class*=control],[class*=select],[class*=Select]\")||f;ctl.dispatchEvent(new MouseEvent(\"mousedown\",{bubbles:true}));ctl.click();f.focus();if(f.tagName===\"INPUT\"&&!f.readOnly)setVal(f,v);const ok=await pickOption(v);if(!ok){f.dispatchEvent(new KeyboardEvent(\"keydown\",{key:\"Enter\",code:\"Enter\",keyCode:13,bubbles:true}));}await W(250);document.body.click();return ok;}f.focus();setVal(f,v);f.blur();return true;}const plan=[[\"First name\",0],[\"Last name\",0],[\"Arabic name\",0],[\"Gender\",1],[\"Phone\",0],[\"National Number\",0],[\"Contractor\",1],[\"Hired By\",1],[\"Hub\",1],[\"Fleet Type\",1],[\"Vehicle Type\",1],[\"Brand\",0],[\"License\",0],[\"Year\",0],[\"Plate Number\",0],[\"City\",1],[\"Area\",1],[\"Street Name\",0]];const miss=[];for(const [k,s] of plan){let r=false;try{r=await fill(k,d[k],s)}catch(e){r=false}if(r===false)miss.push(k);await W(s?400:60);}alert(miss.length?\"اتملى كل حاجة ما عدا: \"+miss.join(\"، \")+\"\\nكمّلهم بإيدك، أو استخدم زرار النسخ جنبهم في الداشبورد.\":\"تم ملء كل الخانات ✓ راجعها قبل الحفظ.\");})();";
+let sysRep=null;
+async function loadImg(id){imgCache[id]=imgCache[id]||(await api("image",{id})).data;return imgCache[id]}
+// stacks several images into one JPEG (for a single upload box)
+async function combine(urls){
+ const imgs=await Promise.all(urls.map(u=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=u})));
+ const W=Math.min(1400,Math.max(...imgs.map(i=>i.width))),gap=24;
+ const hs=imgs.map(i=>Math.round(i.height*W/i.width));
+ const c=document.createElement("canvas");c.width=W;c.height=hs.reduce((a,b)=>a+b,0)+gap*(imgs.length-1);
+ const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);
+ let y=0;imgs.forEach((im,i)=>{g.drawImage(im,0,y,W,hs[i]);y+=hs[i]+gap});
+ return c.toDataURL("image/jpeg",.82);
+}
+// images are prepared as soon as the window opens, so the copy click stays instant
+let sysImgs=null;
+async function prepImages(r){
+ const btn=$("#copyAll");btn.disabled=true;btn.textContent="جاري تجهيز الصور…";sysImgs=null;
+ const out={};
+ try{
+  const fr=r.images?.front||[],bk=r.images?.back||[];
+  if(fr.length)out.__front=await combine(await Promise.all(fr.map(loadImg)));
+  if(bk.length)out.__back=await combine(await Promise.all(bk.map(loadImg)));
+ }catch(err){out.err=err.message}
+ if(sysRep!==r)return;
+ sysImgs=out;btn.disabled=false;btn.textContent=out.err?"نسخ الكل (من غير صور)":"نسخ الكل";
+}
+$("#copyAll").onclick=e=>{
+ if(!sysCurrent||!sysImgs)return;
+ const o={};sysCurrent.forEach(([,rows])=>rows.forEach(([k,v])=>o[k]=v||""));
+ if(sysImgs.__front)o.__front=sysImgs.__front;if(sysImgs.__back)o.__back=sysImgs.__back;
+ copyText("BOSTA_REP:"+JSON.stringify(o),e.currentTarget);
+};
+const BM_CODE="(async()=>{const W=ms=>new Promise(r=>setTimeout(r,ms));let t=\"\";try{t=await navigator.clipboard.readText()}catch(e){}if(!t||t.indexOf(\"BOSTA_REP:\")!==0){t=prompt(\"الصق بيانات المندوب هنا (Ctrl+V) ثم OK\")||\"\"}if(t.indexOf(\"BOSTA_REP:\")!==0){alert(\"انسخ بيانات المندوب الأول من الداشبورد بزرار (نسخ الكل)\");return}const d=JSON.parse(t.slice(10));const norm=s=>String(s||\"\").replace(/\\s+/g,\" \").trim().toLowerCase();const visible=e=>!!(e.offsetWidth||e.offsetHeight||e.getClientRects().length);const SEL=\"input:not([type=hidden]):not([type=file]),textarea,select,[role=combobox],[aria-haspopup],[class*=select],[class*=Select],[class*=dropdown],[class*=Dropdown]\";function labelEl(label){const L=norm(label);return [...document.querySelectorAll(\"label,span,div,p,h1,h2,h3,h4,h5,h6\")].filter(e=>e.children.length===0&&norm(e.textContent)===L&&visible(e))[0]||null;}function boxOf(label,sel,test){const el=labelEl(label);if(!el)return null;let a=el;for(let i=0;i<5&&a;i++){a=a.parentElement;if(!a)break;const f=[...a.querySelectorAll(sel)].filter(test||visible);if(f.length)return {el,a,f};}return null;}function setVal(inp,v){const proto=inp.tagName===\"TEXTAREA\"?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(proto,\"value\").set.call(inp,v);inp.dispatchEvent(new Event(\"input\",{bubbles:true}));inp.dispatchEvent(new Event(\"change\",{bubbles:true}));}function press(el){const o={bubbles:true,cancelable:true,view:window};try{el.dispatchEvent(new PointerEvent(\"pointerdown\",o))}catch(e){}el.dispatchEvent(new MouseEvent(\"mousedown\",o));try{el.dispatchEvent(new PointerEvent(\"pointerup\",o))}catch(e){}el.dispatchEvent(new MouseEvent(\"mouseup\",o));el.click();}function findOption(V,skip){const all=[...document.querySelectorAll(\"[role=option],li,div,span,p,button\")].filter(o=>visible(o)&&o.children.length<3&&!skip.contains(o));return all.find(o=>norm(o.textContent)===V)||all.filter(o=>o.children.length===0).find(o=>norm(o.textContent).startsWith(V));}async function fillSelect(label,v){const b=boxOf(label,SEL);if(!b)return false;const f=b.f[0];if(f.tagName===\"SELECT\"){const o=[...f.options].find(o=>norm(o.textContent)===norm(v))||[...f.options].find(o=>norm(o.textContent).includes(norm(v)));if(!o)return false;Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,\"value\").set.call(f,o.value);f.dispatchEvent(new Event(\"change\",{bubbles:true}));return true;}const V=norm(v);const tries=[f,f.closest(\"[class*=control],[class*=Control]\"),f.parentElement,f.parentElement&&f.parentElement.parentElement].filter((x,i,a)=>x&&a.indexOf(x)===i&&b.a.contains(x));for(const el of tries){press(el);const inp=el.tagName===\"INPUT\"?el:el.querySelector(\"input:not([type=hidden])\");if(inp&&!inp.readOnly){inp.focus();setVal(inp,v)}for(let i=0;i<8;i++){await W(120);const o=findOption(V,b.a.contains(document.activeElement)?b.el:b.el);if(o&&!b.a.contains(o)){press(o);await W(200);return true}}if(inp){inp.focus();inp.dispatchEvent(new KeyboardEvent(\"keydown\",{key:\"ArrowDown\",code:\"ArrowDown\",keyCode:40,bubbles:true}));await W(200);const o=findOption(V,b.el);if(o&&!b.a.contains(o)){press(o);await W(200);return true}}document.dispatchEvent(new KeyboardEvent(\"keydown\",{key:\"Escape\",keyCode:27,bubbles:true}));}return false;}async function fillText(label,v){const b=boxOf(label,\"input:not([type=hidden]):not([type=file]),textarea\");if(!b)return false;const f=b.f[0];f.focus();setVal(f,v);f.blur();return true;}function toFile(dataUrl,name){const m=/^data:([^;]+);base64,(.*)$/.exec(dataUrl);const bin=atob(m[2]);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new File([u],name,{type:m[1]});}function putFile(inp,file){const dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;inp.dispatchEvent(new Event(\"input\",{bubbles:true}));inp.dispatchEvent(new Event(\"change\",{bubbles:true}));}const plan=[[\"First name\",0],[\"Last name\",0],[\"Arabic name\",0],[\"Gender\",1],[\"Phone\",0],[\"National Number\",0],[\"Contractor\",1],[\"Hired By\",1],[\"Hub\",1],[\"Fleet Type\",1],[\"Vehicle Type\",1],[\"Brand\",0],[\"License\",0],[\"Year\",0],[\"Plate Number\",0],[\"City\",1],[\"Area\",1],[\"Street Name\",0]];const miss=[];for(const [k,s] of plan){if(!d[k])continue;let r=false;try{r=s?await fillSelect(k,d[k]):await fillText(k,d[k])}catch(e){r=false}if(!r)miss.push(k);await W(s?350:50);}if(d.__front||d.__back){try{let ins=[];const b=boxOf(\"National ID\",\"input[type=file]\",()=>true);if(b&&b.f.length>=2)ins=b.f;else ins=[...document.querySelectorAll(\"input[type=file]\")];if(ins.length>=2){if(d.__front)putFile(ins[0],toFile(d.__front,\"national-id-front.jpg\"));if(d.__back)putFile(ins[1],toFile(d.__back,\"national-id-back.jpg\"));}else miss.push(\"National ID (الصور)\");}catch(e){miss.push(\"National ID (الصور)\")}}alert(miss.length?\"اتملى كل حاجة ما عدا: \"+miss.join(\"، \")+\"\\nكمّلهم بإيدك، أو استخدم زرار النسخ جنبهم في الداشبورد.\":\"تم ملء كل الخانات ورفع صور البطاقة ✓ راجعها قبل الحفظ.\");})();";
 $("#bmLink").href="javascript:"+encodeURIComponent(BM_CODE);
 $("#bmLink").onclick=e=>{e.preventDefault();alert("اسحب الزرار ده بالماوس وحطه في شريط المفضلة (Bookmarks bar) فوق في المتصفح.")};
 document.addEventListener("click",e=>{
